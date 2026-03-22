@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관상소 — 얼굴이 곧 운명이다</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
@@ -219,71 +220,43 @@ header::before{content:'';position:absolute;top:-100px;left:50%;transform:transl
   color:rgba(200,169,110,.8)}
 
 /* ── 관상 도해 — 사진 + 랜드마크 오버레이 ── */
+/* ── 관상 도해 — 사진 상단 + 카드 그리드 하단 ── */
 .face-diagram-wrap{background:linear-gradient(160deg,#1a1208,#0e0a05);
   border:1px solid rgba(184,134,11,.18);margin-bottom:14px;overflow:hidden}
-.face-diagram-inner{position:relative;width:100%;display:flex;
-  flex-direction:column;align-items:center;padding:20px 16px;gap:16px}
+.face-diagram-inner{width:100%;display:flex;flex-direction:column;
+  align-items:center;padding:20px 16px;gap:14px}
 
-/* 사진 + SVG 오버레이 컨테이너 */
-.photo-overlay-wrap{
-  position:relative;
-  width:280px;
-  flex-shrink:0;
-}
-.photo-overlay-wrap img{
-  width:100%;display:block;border-radius:3px;
-  filter:sepia(8%) contrast(1.05);
-}
-.landmark-svg{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  pointer-events:none;
-}
+/* 사진 영역 */
+.photo-top-wrap{width:100%;max-width:320px;position:relative}
+.photo-top-wrap img{width:100%;display:block;border-radius:4px;
+  filter:sepia(10%) contrast(1.06);box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.photo-top-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50px;
+  background:linear-gradient(transparent,#0e0a05);border-radius:0 0 4px 4px;pointer-events:none}
 
-/* 포인트 애니메이션 */
-.lm-glow{animation:lmPulse 2.2s ease-in-out infinite}
-@keyframes lmPulse{0%,100%{opacity:.35}50%{opacity:.8}}
-
-/* 라벨 칩 */
-.lm-label-bg{rx:4}
-
-/* 부위별 카드 — 하단 2열 그리드 */
-.feature-cols{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;
-}
-.feature-panel{
-  border:1px solid transparent;padding:9px 11px;
-  transition:all .25s;cursor:pointer;
-  display:flex;align-items:center;gap:9px;
-  animation:panelReveal .4s ease both;
-}
-.feature-panel:nth-child(1){animation-delay:.1s}
-.feature-panel:nth-child(2){animation-delay:.18s}
-.feature-panel:nth-child(3){animation-delay:.26s}
-.feature-panel:nth-child(4){animation-delay:.34s}
-.feature-panel:nth-child(5){animation-delay:.42s}
-.feature-panel:nth-child(6){animation-delay:.50s}
-@keyframes panelReveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.feature-panel.good{background:rgba(15,55,28,.35);border-color:rgba(46,204,113,.2)}
-.feature-panel.bad {background:rgba(80,15,15,.35); border-color:rgba(231,76,60,.2)}
-.feature-panel.good:hover{background:rgba(15,55,28,.55);border-color:rgba(46,204,113,.45)}
-.feature-panel.bad:hover {background:rgba(80,15,15,.55); border-color:rgba(231,76,60,.45)}
-.feature-panel.highlight{transform:scale(1.02);box-shadow:0 0 12px rgba(184,134,11,.2)}
-.fp-hanja{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:900;
-  flex-shrink:0;width:26px;text-align:center;line-height:1}
-.feature-panel.good .fp-hanja{color:#2ECC71}
-.feature-panel.bad  .fp-hanja{color:#E74C3C}
-.fp-content{flex:1;min-width:0}
-.fp-top{display:flex;align-items:center;gap:5px;margin-bottom:2px}
-.fp-part{font-size:10px;letter-spacing:2px;color:var(--paper);font-weight:600}
-.fp-badge{font-size:7px;letter-spacing:1px;font-weight:700;padding:1px 5px}
-.feature-panel.good .fp-badge{background:rgba(46,204,113,.18);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
-.feature-panel.bad  .fp-badge{background:rgba(231,76,60,.18); color:#E74C3C;border:1px solid rgba(231,76,60,.3)}
-.fp-short{font-size:11px;font-weight:700;color:var(--paper);margin-bottom:1px}
-.fp-meaning{font-size:9px;color:rgba(200,169,110,.5);line-height:1.4;font-weight:300;word-break:keep-all}
-
-/* 랜드마크 로딩 상태 */
-.lm-detecting{text-align:center;padding:12px;font-size:10px;letter-spacing:3px;color:var(--paper-dim)}
+/* 6개 카드 그리드 */
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.fg-card{border:1px solid transparent;padding:12px 8px;text-align:center;
+  transition:transform .2s;animation:cardReveal .4s ease both}
+.fg-card:hover{transform:translateY(-2px)}
+.fg-card:nth-child(1){animation-delay:.08s}.fg-card:nth-child(2){animation-delay:.16s}
+.fg-card:nth-child(3){animation-delay:.24s}.fg-card:nth-child(4){animation-delay:.32s}
+.fg-card:nth-child(5){animation-delay:.40s}.fg-card:nth-child(6){animation-delay:.48s}
+@keyframes cardReveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fg-card.good{background:rgba(15,55,28,.4);border-color:rgba(46,204,113,.22)}
+.fg-card.bad {background:rgba(80,15,15,.4); border-color:rgba(231,76,60,.22)}
+.fg-badge{display:inline-block;font-size:7px;letter-spacing:2px;font-weight:700;
+  padding:2px 7px;margin-bottom:6px}
+.fg-card.good .fg-badge{background:rgba(46,204,113,.18);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
+.fg-card.bad  .fg-badge{background:rgba(231,76,60,.18); color:#E74C3C;border:1px solid rgba(231,76,60,.3)}
+.fg-icon{font-size:22px;margin-bottom:4px;display:block}
+.fg-hanja{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:900;line-height:1;margin-bottom:2px}
+.fg-card.good .fg-hanja{color:#2ECC71}.fg-card.bad .fg-hanja{color:#E74C3C}
+.fg-part{font-size:9px;letter-spacing:2px;color:rgba(200,169,110,.55);margin-bottom:5px}
+.fg-divider{height:1px;margin:0 auto 5px;width:60%}
+.fg-card.good .fg-divider{background:linear-gradient(90deg,transparent,rgba(46,204,113,.4),transparent)}
+.fg-card.bad  .fg-divider{background:linear-gradient(90deg,transparent,rgba(231,76,60,.4),transparent)}
+.fg-short{font-size:11px;font-weight:700;color:var(--paper);margin-bottom:2px}
+.fg-meaning{font-size:9px;color:rgba(200,169,110,.45);line-height:1.5;font-weight:300;word-break:keep-all}
 
 /* ── 운세 게이지 ── */
 .gauge-section{border:1px solid rgba(184,134,11,.12);margin-bottom:14px;overflow:hidden}
@@ -489,8 +462,8 @@ footer{border-top:1px solid rgba(184,134,11,.09);text-align:center;padding:20px}
   .items-full{grid-column:1}
   .couple-uploads{grid-template-columns:1fr}
   .face-diagram-inner{padding:14px 10px;gap:12px}
-  .photo-overlay-wrap{width:100%}
-  .feature-cols{grid-template-columns:1fr 1fr}
+  .face-photo-top{max-width:100%}
+  .feature-cols{grid-template-columns:repeat(3,1fr)}
   .score-card,.compat-score-card{flex-direction:column;text-align:center;padding:20px 16px;gap:16px}
   .today-score-row{flex-direction:column;gap:8px}
 }
@@ -1021,222 +994,38 @@ function buildTimeline(tl){
   setTimeout(()=>document.querySelectorAll('.tl-score-fill').forEach(el=>el.style.width=el.dataset.val+'%'),200);
 }
 
-/* ── 관상 도해 — 사진 + face-api.js 랜드마크 ── */
-
-// 랜드마크 포인트 데이터 (buildFaceDiagram 호출 시 저장)
+/* ── 관상 도해 — 사진 상단 + 6카드 그리드 ── */
 let _diagramPoints = [];
+
+// 부위별 아이콘
+const FEAT_ICONS = {
+  '이마':'🧠','눈':'👀','코':'👃','입':'🗣️','귀':'👂','턱':'💪','눈썹':'🤨'
+};
 
 function buildFaceDiagram(points){
   _diagramPoints = points;
   const inner = document.getElementById('faceDiagramInner');
 
-  // 패널 카드 (하단 2열)
-  const panelCards = points.map(p => `
-    <div class="feature-panel ${p.grade||''}" id="panel_${p.part}">
-      <div class="fp-hanja">${p.hanja}</div>
-      <div class="fp-content">
-        <div class="fp-top">
-          <div class="fp-part">${p.part}</div>
-          <div class="fp-badge">${p.grade==='good'?'✦ GOOD':'✦ BAD'}</div>
-        </div>
-        <div class="fp-short">${p.short}</div>
-        <div class="fp-meaning">${p.meaning||''}</div>
-      </div>
+  // 6개 카드
+  const cards = points.map(p => `
+    <div class="fg-card ${p.grade||''}">
+      <div class="fg-badge">${p.grade==='good'?'✦ GOOD':'✦ BAD'}</div>
+      <span class="fg-icon">${FEAT_ICONS[p.part]||'✦'}</span>
+      <div class="fg-hanja">${p.hanja}</div>
+      <div class="fg-part">${p.part}</div>
+      <div class="fg-divider"></div>
+      <div class="fg-short">${p.short}</div>
+      <div class="fg-meaning">${p.meaning||''}</div>
     </div>`).join('');
 
   inner.innerHTML = `
-    <div class="photo-overlay-wrap" id="photoOverlayWrap">
-      <img src="${previewDataUrl}" id="overlayPhoto" alt="관상" crossorigin="anonymous"/>
-      <svg class="landmark-svg" id="landmarkSvg"></svg>
+    <div class="photo-top-wrap">
+      <img src="${previewDataUrl}" alt="관상" />
     </div>
-    <div class="feature-cols">${panelCards}</div>`;
-
-  // 이미지 로드 후 face-api 실행
-  const imgEl = document.getElementById('overlayPhoto');
-  if(imgEl.complete) detectAndDraw(imgEl, points);
-  else imgEl.onload = () => detectAndDraw(imgEl, points);
+    <div class="feature-grid">${cards}</div>`;
 }
 
-// face-api.js 모델 로드 여부
-let faceApiLoaded = false;
-let faceApiLoading = false;
-
-async function ensureFaceApi(){
-  if(faceApiLoaded) return true;
-  if(faceApiLoading) {
-    // 로딩 중이면 대기
-    for(let i=0;i<30;i++){
-      await new Promise(r=>setTimeout(r,200));
-      if(faceApiLoaded) return true;
-    }
-    return false;
-  }
-  try{
-    faceApiLoading = true;
-    // CDN에서 모델 로드
-    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL);
-    faceApiLoaded = true;
-    return true;
-  } catch(e){
-    console.warn('face-api load failed:', e);
-    faceApiLoading = false;
-    return false;
-  }
-}
-
-async function detectAndDraw(imgEl, points){
-  const svg = document.getElementById('landmarkSvg');
-  if(!svg) return;
-
-  // face-api 로드 시도
-  const ok = await ensureFaceApi();
-  if(!ok){
-    // fallback: 고정 비율로 포인트 그리기
-    drawFallbackPoints(imgEl, svg, points);
-    return;
-  }
-
-  try{
-    const detection = await faceapi
-      .detectSingleFace(imgEl, new faceapi.TinyFaceDetectorOptions())
-      .withFaceLandmarks(true);
-
-    if(!detection){
-      drawFallbackPoints(imgEl, svg, points);
-      return;
-    }
-
-    const lm = detection.landmarks;
-    const iW = imgEl.offsetWidth || imgEl.naturalWidth;
-    const iH = imgEl.offsetHeight || imgEl.naturalHeight;
-    const scaleX = iW / imgEl.naturalWidth;
-    const scaleY = iH / imgEl.naturalHeight;
-
-    // 68 랜드마크에서 부위별 대표 좌표 추출
-    const positions = lm.positions;
-    function avg(pts){ return {x:pts.reduce((s,p)=>s+p.x,0)/pts.length, y:pts.reduce((s,p)=>s+p.y,0)/pts.length}; }
-
-    const landmarks = {
-      '이마': {x: avg(positions.slice(0,17)).x, y: Math.min(...positions.map(p=>p.y)) - (detection.detection.box.height * 0.08)},
-      '눈썹': avg(positions.slice(17,27)),
-      '눈':   avg([...positions.slice(36,42), ...positions.slice(42,48)]),
-      '코':   avg(positions.slice(27,36)),
-      '입':   avg(positions.slice(48,68)),
-      '턱':   positions[8],
-      '귀':   {left: avg(positions.slice(0,3)), right: avg(positions.slice(14,17))},
-    };
-
-    drawLandmarkPoints(svg, points, landmarks, scaleX, scaleY);
-  } catch(e){
-    console.warn('detection error:', e);
-    drawFallbackPoints(imgEl, svg, points);
-  }
-}
-
-function drawLandmarkPoints(svg, points, landmarks, sx, sy){
-  const W = svg.getBoundingClientRect().width || 280;
-  const H = svg.getBoundingClientRect().height || 373;
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-
-  let html = '';
-  points.forEach((p, i) => {
-    let coord;
-    if(p.part === '귀'){
-      coord = p.side === 'left'
-        ? {x:(landmarks['귀'].left.x)*sx, y:(landmarks['귀'].left.y)*sy}
-        : {x:(landmarks['귀'].right.x)*sx, y:(landmarks['귀'].right.y)*sy};
-    } else {
-      const lm = landmarks[p.part];
-      if(!lm){ return; }
-      coord = {x: lm.x * sx, y: lm.y * sy};
-    }
-
-    // 클램핑
-    const cx = Math.max(10, Math.min(W-10, coord.x));
-    const cy = Math.max(10, Math.min(H-10, coord.y));
-
-    const isGood = p.grade === 'good';
-    const col  = isGood ? '#2ECC71' : '#E74C3C';
-    const glow = isGood ? 'rgba(46,204,113,.22)' : 'rgba(231,76,60,.22)';
-    const lineCol = isGood ? 'rgba(46,204,113,.5)' : 'rgba(231,76,60,.5)';
-
-    // 라벨 위치 (번갈아 좌우)
-    const labelRight = (i % 2 === 0);
-    const labelX = labelRight ? Math.min(cx + 18, W - 60) : Math.max(cx - 18, 4);
-    const labelAnchor = labelRight ? 'start' : 'end';
-    const labelLineX2 = labelRight ? labelX : labelX;
-
-    html += `
-      <circle cx="${cx}" cy="${cy}" r="13" fill="${glow}" class="lm-glow"/>
-      <circle cx="${cx}" cy="${cy}" r="5.5" fill="none" stroke="${col}" stroke-width="1.4" opacity=".9"/>
-      <circle cx="${cx}" cy="${cy}" r="2.2" fill="${col}"/>
-      <line x1="${cx}" y1="${cy}" x2="${labelLineX2}" y2="${cy}" stroke="${lineCol}" stroke-width=".8" stroke-dasharray="3,2"/>
-      <rect x="${labelRight?labelX:labelX-52}" y="${cy-11}" width="52" height="14" rx="3"
-        fill="rgba(10,8,4,.75)" stroke="${col}" stroke-width=".6" opacity=".9"/>
-      <text x="${labelRight?labelX+4:labelX-4}" y="${cy+1}" font-size="8" fill="${col}"
-        font-family="Noto Serif KR,serif" font-weight="700" text-anchor="${labelAnchor}">${p.part} · ${p.short}</text>
-    `;
-  });
-  svg.innerHTML = html;
-}
-
-function drawFallbackPoints(imgEl, svg, points){
-  // face-api 실패 시 — 얼굴 비율 기반 고정 좌표
-  const iW = imgEl.offsetWidth || 280;
-  const iH = imgEl.offsetHeight || 373;
-  svg.setAttribute('viewBox', `0 0 ${iW} ${iH}`);
-
-  const RATIO = {
-    '이마': {xr:.5,  yr:.12},
-    '눈':   {xr:.5,  yr:.32},
-    '귀':   {left:{xr:.08,yr:.36}, right:{xr:.92,yr:.36}},
-    '코':   {xr:.5,  yr:.52},
-    '입':   {xr:.5,  yr:.66},
-    '턱':   {xr:.5,  yr:.80},
-    '눈썹': {xr:.5,  yr:.24},
-  };
-
-  let html = '';
-  points.forEach((p, i) => {
-    const r = RATIO[p.part] || {xr:.5,yr:.5};
-    let cx, cy;
-    if(p.part==='귀'){
-      const side = p.side==='left' ? r.left : r.right;
-      cx = side.xr * iW; cy = side.yr * iH;
-    } else {
-      cx = r.xr * iW; cy = r.yr * iH;
-    }
-
-    const isGood = p.grade==='good';
-    const col   = isGood ? '#2ECC71' : '#E74C3C';
-    const glow  = isGood ? 'rgba(46,204,113,.22)' : 'rgba(231,76,60,.22)';
-    const lCol  = isGood ? 'rgba(46,204,113,.5)'  : 'rgba(231,76,60,.5)';
-    const labelRight = (i%2===0);
-    const lx = labelRight ? Math.min(cx+18,iW-60) : Math.max(cx-18,4);
-    const anchor = labelRight ? 'start' : 'end';
-
-    html += `
-      <circle cx="${cx}" cy="${cy}" r="13" fill="${glow}" class="lm-glow"/>
-      <circle cx="${cx}" cy="${cy}" r="5.5" fill="none" stroke="${col}" stroke-width="1.4" opacity=".9"/>
-      <circle cx="${cx}" cy="${cy}" r="2.2" fill="${col}"/>
-      <line x1="${cx}" y1="${cy}" x2="${lx}" y2="${cy}" stroke="${lCol}" stroke-width=".8" stroke-dasharray="3,2"/>
-      <rect x="${labelRight?lx:lx-52}" y="${cy-11}" width="52" height="14" rx="3"
-        fill="rgba(10,8,4,.75)" stroke="${col}" stroke-width=".6" opacity=".9"/>
-      <text x="${labelRight?lx+4:lx-4}" y="${cy+1}" font-size="8" fill="${col}"
-        font-family="Noto Serif KR,serif" font-weight="700" text-anchor="${anchor}">${p.part} · ${p.short}</text>
-    `;
-  });
-  svg.innerHTML = html;
-}
-
-function highlightPanel(part){
-  document.querySelectorAll('.feature-panel').forEach(el=>{
-    el.classList.toggle('highlight', el.id==='panel_'+part);
-  });
-  setTimeout(()=>document.querySelectorAll('.feature-panel').forEach(el=>el.classList.remove('highlight')),2000);
-}
+function highlightPanel(part){}
 
 
 /* ── 궁합 ── */
@@ -1326,217 +1115,35 @@ function renderToday(r,today){
   document.getElementById('resultToday').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* ── 결과 카드 이미지 저장 ── */
+/* ── 결과 카드 이미지 저장 — html2canvas ── */
 async function saveResultCard(type){
   const r = currentResult; if(!r){ showToast('결과가 없소'); return; }
   showToast('🖼 카드를 만드는 중이오...');
 
-  const W = 600;
-  const PHOTO_W = 260;
-  const PHOTO_H = 346;
-  const PADDING = 20;
-  const H = PADDING + PHOTO_H + 160; // 사진높이 + 하단 영역
+  // 저장할 결과 영역
+  const el = document.getElementById(type === 'couple' ? 'resultCouple' : 'resultSingle');
+  if(!el){ showToast('결과 영역을 찾을 수 없소'); return; }
 
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  // ── 배경 ──
-  ctx.fillStyle = '#0A0804';
-  ctx.fillRect(0, 0, W, H);
-
-  // 배경 그라디언트
-  const grad = ctx.createRadialGradient(W/2, H*0.3, 0, W/2, H*0.3, W*0.6);
-  grad.addColorStop(0, 'rgba(184,134,11,0.06)');
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // 외곽 테두리
-  ctx.strokeStyle = 'rgba(184,134,11,0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(12, 12, W-24, H-24);
-
-  // 모서리 장식
-  const corners = [[16,16],[W-16,16],[16,H-16],[W-16,H-16]];
-  corners.forEach(([x,y],i) => {
-    ctx.strokeStyle = 'rgba(184,134,11,0.5)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    const sx = i%2===0?1:-1, sy = i<2?1:-1;
-    ctx.moveTo(x, y+sy*14); ctx.lineTo(x,y); ctx.lineTo(x+sx*14,y);
-    ctx.stroke();
-  });
-
-  // ── 상단: 한줄평 + 점수 ──
-  const score = r.total_score || r.score || r.today_score || '';
-  const summary = r.summary || r.today_summary || '';
-  const title = r.title || r.today_title || '관상소';
-
-  // 타이틀
-  ctx.fillStyle = 'rgba(184,134,11,0.8)';
-  ctx.font = '12px "Noto Serif KR", serif';
-  ctx.textAlign = 'center';
-  ctx.letterSpacing = '4px';
-  ctx.fillText('관  상  소', W/2, 40);
-
-  // 관상명
-  ctx.fillStyle = 'rgba(200,169,110,0.95)';
-  ctx.font = 'bold 22px "Noto Serif KR", serif';
-  ctx.fillText(title, W/2, 72);
-
-  // 점수 원 (좌측 상단)
-  if(score){
-    const cx2 = 70, cy2 = 130, radius = 38;
-    ctx.beginPath();
-    ctx.arc(cx2, cy2, radius, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(139,26,26,0.3)';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    // 점수 아크
-    const prog = score / 100;
-    ctx.beginPath();
-    ctx.arc(cx2, cy2, radius, -Math.PI/2, -Math.PI/2 + Math.PI*2*prog);
-    ctx.strokeStyle = '#C0392B';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    // 점수 숫자
-    ctx.fillStyle = 'rgba(200,169,110,0.95)';
-    ctx.font = 'bold 26px "Noto Serif KR", serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(score, cx2, cy2+8);
-    ctx.fillStyle = 'rgba(200,169,110,0.5)';
-    ctx.font = '10px sans-serif';
-    ctx.fillText('/ 100', cx2, cy2+22);
-  }
-
-  // 한줄평
-  ctx.fillStyle = 'rgba(200,169,110,0.9)';
-  ctx.font = '15px "Noto Serif KR", serif';
-  ctx.textAlign = 'left';
-  let tx = 128, ty = 110;
-  let line2 = '', chars = Array.from(summary);
-  chars.forEach(ch => {
-    if(ctx.measureText(line2+ch).width > 430){ ctx.fillText(line2,tx,ty); line2=ch; ty+=22; }
-    else line2+=ch;
-  });
-  ctx.fillText(line2, tx, ty);
-
-  // 구분선
-  ctx.strokeStyle = 'rgba(184,134,11,0.2)';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(20,158); ctx.lineTo(W-20,158); ctx.stroke();
-
-  // ── 중단: 관상 도해 사진 ──
-  const photoY = 168;
-  const photoX = (W - PHOTO_W) / 2;
-
-  if(previewDataUrl && type !== 'couple'){
-    await new Promise(resolve => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        // 사진 클립 & 그리기
-        ctx.save();
-        ctx.beginPath();
-        ctx.roundRect(photoX, photoY, PHOTO_W, PHOTO_H, 4);
-        ctx.clip();
-        ctx.drawImage(img, photoX, photoY, PHOTO_W, PHOTO_H);
-
-        // 비네팅
-        const vig = ctx.createRadialGradient(
-          photoX+PHOTO_W/2, photoY+PHOTO_H/2, PHOTO_H*0.25,
-          photoX+PHOTO_W/2, photoY+PHOTO_H/2, PHOTO_H*0.7
-        );
-        vig.addColorStop(0, 'rgba(0,0,0,0)');
-        vig.addColorStop(1, 'rgba(10,8,4,0.65)');
-        ctx.fillStyle = vig;
-        ctx.fillRect(photoX, photoY, PHOTO_W, PHOTO_H);
-        ctx.restore();
-
-        // 사진 테두리
-        ctx.strokeStyle = 'rgba(184,134,11,0.4)';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(photoX, photoY, PHOTO_W, PHOTO_H);
-
-        // 포인트 오버레이 (face_points 기반 고정 비율)
-        if(r.face_points){
-          const RATIO = {
-            '이마':{xr:.5,yr:.12},'눈':{left:{xr:.32,yr:.32},right:{xr:.68,yr:.32}},
-            '귀': {left:{xr:.06,yr:.36},right:{xr:.94,yr:.36}},
-            '코': {xr:.5,yr:.52},'입':{xr:.5,yr:.66},'턱':{xr:.5,yr:.80},
-          };
-          r.face_points.forEach((p,i) => {
-            const ra = RATIO[p.part];
-            if(!ra) return;
-            let px2, py2;
-            if(p.part==='눈'||p.part==='귀'){
-              const side = p.side==='left' ? ra.left||ra : ra.right||ra;
-              px2 = photoX + side.xr*PHOTO_W;
-              py2 = photoY + side.yr*PHOTO_H;
-            } else {
-              px2 = photoX + ra.xr*PHOTO_W;
-              py2 = photoY + ra.yr*PHOTO_H;
-            }
-            const isGood = p.grade==='good';
-            const col = isGood ? '#2ECC71' : '#E74C3C';
-            const glow = isGood ? 'rgba(46,204,113,0.2)' : 'rgba(231,76,60,0.2)';
-
-            ctx.beginPath(); ctx.arc(px2,py2,10,0,Math.PI*2);
-            ctx.fillStyle=glow; ctx.fill();
-            ctx.beginPath(); ctx.arc(px2,py2,4.5,0,Math.PI*2);
-            ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.stroke();
-            ctx.beginPath(); ctx.arc(px2,py2,2,0,Math.PI*2);
-            ctx.fillStyle=col; ctx.fill();
-
-            // 라벨
-            const labelRight = px2 < photoX+PHOTO_W/2;
-            const lx3 = labelRight ? px2+14 : px2-14;
-            const anchor3 = labelRight ? 'left' : 'right';
-            ctx.fillStyle='rgba(10,8,4,0.8)';
-            const lw3=56, lh3=13;
-            const lrx3=anchor3==='left'?lx3:lx3-lw3;
-            ctx.fillRect(lrx3-1, py2-lh3/2-1, lw3+2, lh3+2);
-            ctx.strokeStyle=col; ctx.lineWidth=0.6;
-            ctx.strokeRect(lrx3-1, py2-lh3/2-1, lw3+2, lh3+2);
-            ctx.fillStyle=col;
-            ctx.font='bold 8px serif';
-            ctx.textAlign=anchor3;
-            ctx.fillText(`${p.part}·${p.short}`, lx3, py2+3);
-          });
-        }
-        resolve();
-      };
-      img.onerror = resolve;
-      img.src = previewDataUrl;
+  try{
+    const canvas = await html2canvas(el, {
+      backgroundColor: '#0A0804',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
     });
+
+    const link = document.createElement('a');
+    link.download = 'gwansang_result.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('🖼 결과 카드가 저장됐소!');
+  } catch(err){
+    console.error('html2canvas error:', err);
+    showToast('저장 중 오류가 발생했소: ' + err.message);
   }
-
-  // ── 하단: 인장 + 출처 ──
-  const bottomY = photoY + PHOTO_H + 16;
-
-  // 인장
-  ctx.strokeStyle='rgba(139,26,26,0.7)'; ctx.lineWidth=1.5;
-  ctx.strokeRect(W-110, bottomY, 90, 40);
-  ctx.fillStyle='rgba(192,57,43,0.8)';
-  ctx.font='bold 10px serif'; ctx.textAlign='center';
-  ctx.fillText('관상소', W-65, bottomY+16);
-  ctx.fillStyle='rgba(200,169,110,0.5)';
-  ctx.font='9px sans-serif';
-  ctx.fillText('판독완료', W-65, bottomY+30);
-
-  // 출처
-  ctx.fillStyle='rgba(200,169,110,0.25)';
-  ctx.font='9px sans-serif'; ctx.textAlign='left';
-  ctx.fillText('관상소 — 얼굴이 곧 운명이다', 20, bottomY+24);
-
-  // 저장
-  const link = document.createElement('a');
-  link.download = 'gwansang_result.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-  showToast('🖼 결과 카드가 저장됐소!');
 }
 
 function shareResult(){
@@ -1614,4 +1221,47 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 })();
 </script>
 </body>
-</html>
+</html>/* ── 결과 카드 이미지 저장 — html2canvas 방식 ── */
+async function saveResultCard(type){
+  showToast('🖼 카드를 만드는 중이오...');
+
+  // html2canvas CDN 동적 로드
+  if(!window.html2canvas){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  // 캡처할 타겟 — 결과 wrap 전체
+  const target = type==='couple'
+    ? document.getElementById('resultCouple')
+    : document.getElementById('resultSingle');
+
+  if(!target){ showToast('결과가 없소'); return; }
+
+  try{
+    const canvas = await html2canvas(target, {
+      backgroundColor: '#0A0804',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'gwansang_result.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('🖼 결과 카드가 저장됐소!');
+  } catch(e){
+    console.error(e);
+    showToast('⚠️ 저장 중 오류가 발생했소');
+  }
+}
+
+
