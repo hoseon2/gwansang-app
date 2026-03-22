@@ -1,0 +1,8 @@
+{
+  "name": "gwansang-app",
+  "version": "1.0.0",
+  "description": "관상소 — 얼굴이 곧 운명이다",
+  "engines": {
+    "node": "24.x"
+  }
+}
