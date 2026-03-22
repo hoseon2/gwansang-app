@@ -29,17 +29,20 @@ export default async function handler(req, res) {
     + '규칙:\n'
     + '1. face_points y_pct 고정값 → 이마=14, 눈=37, 코=52, 귀=40, 입=67, 턱=82\n'
     + '2. face_points grade → good 또는 bad 중 하나만 사용\n'
-    + '3. gauges avg → ' + avgLabel + ' 평균 수치로 설정\n'
-    + '4. short, meaning, reading, comment는 사진 속 인물을 직접 보고 맞춤 분석\n'
-    + '5. overall, love, past, today 중 해당 항목만 실제 내용 작성, 나머지는 빈 문자열\n\n'
+    + '3. gauges my/avg → ' + avgLabel + ' 기준, 0~100 사이 정수\n'
+    + '4. total_score → 전체 관상 종합 점수 0~100 정수\n'
+    + '5. summary → 이 사람의 관상을 한 문장으로 압축. 강렬하고 인상적으로. 30자 이내.\n'
+    + '6. 모든 텍스트는 사진 속 실제 인물을 보고 맞춤 분석할 것\n\n'
     + '반환 JSON:\n'
     + '{\n'
-    + '  "title": "관상을 한자어로 한 마디",\n'
+    + '  "title": "관상을 한자어로 한 마디 (예: 貴骨福相)",\n'
+    + '  "total_score": 78,\n'
+    + '  "summary": "재물과 인복을 타고난 복중지상이오",\n'
     + '  "gauges": [\n'
-    + '    {"label":"재물운","my":75,"avg":62,"comment":"' + avgLabel + ' 대비 재물운 코멘트"},\n'
-    + '    {"label":"연애운","my":88,"avg":70,"comment":"' + avgLabel + ' 대비 연애운 코멘트"},\n'
-    + '    {"label":"건강운","my":60,"avg":65,"comment":"' + avgLabel + ' 대비 건강운 코멘트"},\n'
-    + '    {"label":"직업운","my":82,"avg":68,"comment":"' + avgLabel + ' 대비 직업운 코멘트"}\n'
+    + '    {"label":"재물운","icon":"💰","my":75,"avg":62,"comment":"동년배보다 높소"},\n'
+    + '    {"label":"연애운","icon":"💕","my":88,"avg":70,"comment":"인연이 풍부하오"},\n'
+    + '    {"label":"건강운","icon":"🌿","my":60,"avg":65,"comment":"관리가 필요하오"},\n'
+    + '    {"label":"직업운","icon":"⚡","my":82,"avg":68,"comment":"두각을 나타낼 상이오"}\n'
     + '  ],\n'
     + '  "face_points": [\n'
     + '    {"part":"이마","hanja":"額","side":"left", "y_pct":14,"grade":"good","short":"지혜의 상","meaning":"이마가 넓은 사람은 생각이 깊고 앞날이 트인다","reading":"이마가 넓어 지혜와 복이 가득하오"},\n'
@@ -49,7 +52,7 @@ export default async function handler(req, res) {
     + '    {"part":"귀",  "hanja":"耳","side":"left", "y_pct":40,"grade":"good","short":"장수의 귀","meaning":"귓불이 두툼하면 수명이 길고 복록이 따른다","reading":"귀가 두툼하여 장수할 상이오"},\n'
     + '    {"part":"턱",  "hanja":"頤","side":"right","y_pct":82,"grade":"good","short":"말년복",   "meaning":"턱이 든든하면 말년에 안정과 풍요가 온다","reading":"턱이 든든하여 말년복이 들어오리오"}\n'
     + '  ],\n'
-    + '  "overall": ' + JSON.stringify(hasOverall ? '전체 운세 분석 (재물/연애/건강/직업 각각, 관상가 말투로 시작해 MZ 감성 마무리, 이모지 활용, 12줄 이내)' : '') + ',\n'
+    + '  "overall": ' + JSON.stringify(hasOverall ? '전체 운세 분석. 재물/연애/건강/직업 각각. 관상가 말투로 시작해 MZ 감성 마무리. 이모지 활용. 12줄 이내.' : '') + ',\n'
     + '  "love":    ' + JSON.stringify(hasLove    ? '연애운 집중 분석. 어떤 인연, 지금 흐름. 공감 가게. 8줄 이내.' : '') + ',\n'
     + '  "past":    ' + JSON.stringify(hasPast    ? '전생과 팔자. 황당하지만 그럴싸하게.' : '') + ',\n'
     + '  "today":   ' + JSON.stringify(hasToday   ? '오늘의 신탁 한마디. 짧고 강렬하게. 1~2문장.' : '') + '\n'
@@ -71,13 +74,7 @@ export default async function handler(req, res) {
           {
             role: 'user',
             content: [
-              {
-                type: 'image_url',
-                image_url: {
-                  url: 'data:' + (imageType || 'image/jpeg') + ';base64,' + imageBase64,
-                  detail: 'high'
-                }
-              },
+              { type: 'image_url', image_url: { url: 'data:' + (imageType || 'image/jpeg') + ';base64,' + imageBase64, detail: 'high' } },
               { type: 'text', text: userPrompt }
             ]
           }
@@ -86,21 +83,16 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    if (!response.ok || data.error) {
-      throw new Error(data.error?.message || 'OpenAI 오류 ' + response.status);
-    }
+    if (!response.ok || data.error) throw new Error(data.error?.message || 'OpenAI 오류 ' + response.status);
 
     const text = data.choices?.[0]?.message?.content || '';
-
     let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
+    try { result = JSON.parse(text); }
+    catch (e) {
       const match = text.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim().match(/\{[\s\S]*\}/);
       if (!match) throw new Error('JSON 파싱 실패: ' + text.substring(0, 300));
       result = JSON.parse(match[0]);
     }
-
     return res.status(200).json(result);
   } catch (err) {
     console.error('관상 API 오류:', err.message);
