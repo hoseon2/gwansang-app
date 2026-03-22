@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관상소 — 얼굴이 곧 운명이다</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+:root {
+  --ink:#0A0804; --charcoal:#141008; --deep:#1C1510;
+  --paper:#C8A96E; --paper-dim:#A08040; --paper-dark:#6B5020;
+  --red:#8B1A1A; --red-bright:#C0392B; --red-dim:#5C1010;
+  --gold:#B8860B; --gold-light:#D4A017;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Serif KR',serif;background:var(--ink);color:var(--paper);min-height:100vh;overflow-x:hidden}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(184,134,11,.06) 0%,transparent 60%),
+    radial-gradient(ellipse at 20% 100%,rgba(139,26,26,.08) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+.candle-glow{position:fixed;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,160,48,.04) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;
+  animation:candleFlicker 5s ease-in-out infinite}
+@keyframes candleFlicker{
+  0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  30%{opacity:.7;transform:translate(-50%,-51%) scale(.97)}
+  60%{opacity:.9;transform:translate(-49%,-50%) scale(1.02)}
+  80%{opacity:.75;transform:translate(-51%,-50%) scale(.98)}}
+
+.wrap{position:relative;z-index:1}
+
+/* HEADER */
+header{text-align:center;padding:64px 24px 48px;border-bottom:1px solid rgba(184,134,11,.15);overflow:hidden;position:relative}
+header::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,26,26,.12) 0%,transparent 65%);pointer-events:none}
+
+.header-seal{display:inline-flex;flex-direction:column;align-items:center;gap:18px;
+  animation:sealReveal 1.4s cubic-bezier(.22,1,.36,1) both}
+@keyframes sealReveal{from{opacity:0;transform:translateY(-30px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.seal-circle{width:88px;height:88px;border:1px solid rgba(184,134,11,.4);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+.seal-circle::before{content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid rgba(139,26,26,.2);animation:rotateSeal 20s linear infinite}
+@keyframes rotateSeal{to{transform:rotate(360deg)}}
+.seal-circle::after{content:'觀';font-size:40px;font-weight:900;color:var(--red);
+  text-shadow:0 0 20px rgba(192,57,43,.4);line-height:1}
+
+.site-title{font-size:clamp(40px,7vw,72px);font-weight:900;letter-spacing:14px;color:var(--paper);
+  text-shadow:2px 2px 0 rgba(0,0,0,.8),0 0 40px rgba(184,134,11,.2);
+  animation:titleReveal 1.6s cubic-bezier(.22,1,.36,1) .2s both}
+@keyframes titleReveal{from{opacity:0;letter-spacing:40px;filter:blur(4px)}to{opacity:1;letter-spacing:14px;filter:blur(0)}}
+
+.site-tagline{font-size:12px;letter-spacing:7px;color:var(--paper-dim);font-weight:300;
+  animation:fadeUp .8s ease .8s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.ornament-row{display:flex;align-items:center;justify-content:center;gap:14px;
+  margin-top:24px;animation:fadeUp .8s ease 1s both}
+.orn-line{width:70px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,.5))}
+.orn-line.r{background:linear-gradient(90deg,rgba(184,134,11,.5),transparent)}
+.orn-char{font-size:13px;color:var(--gold);letter-spacing:4px}
+
+/* MAIN */
+.main{max-width:700px;margin:0 auto;padding:60px 24px 100px}
+
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.sec-hanja{font-size:26px;font-weight:900;color:var(--red);line-height:1;
+  text-shadow:0 0 12px rgba(139,26,26,.5)}
+.sec-ko{font-size:10px;letter-spacing:5px;color:var(--paper-dim);font-weight:300}
+.sec-rule{flex:1;height:1px;background:linear-gradient(90deg,rgba(184,134,11,.4),transparent)}
+
+/* UPLOAD */
+.upload-zone{position:relative;background:linear-gradient(135deg,#1a1208,#120e06);
+  border:1px solid rgba(184,134,11,.25);aspect-ratio:3/2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;cursor:pointer;overflow:hidden;transition:border-color .3s;margin-bottom:0}
+.upload-zone:hover{border-color:rgba(184,134,11,.5)}
+.upload-zone.filled{border-color:rgba(184,134,11,.4)}
+.uz-corner{position:absolute;font-size:10px;color:rgba(184,134,11,.3);font-weight:900;line-height:1}
+.uz-corner.tl{top:10px;left:12px}.uz-corner.tr{top:10px;right:12px}
+.uz-corner.bl{bottom:10px;left:12px}.uz-corner.br{bottom:10px;right:12px}
+.upload-zone::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 40%,rgba(232,160,48,.04) 0%,transparent 60%);pointer-events:none}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:3}
+.upload-eye{font-size:32px;opacity:.5;animation:eyePulse 3s ease-in-out infinite}
+@keyframes eyePulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}
+.upload-tm{font-size:16px;font-weight:600;letter-spacing:4px;color:var(--paper)}
+.upload-ts{font-size:10px;letter-spacing:3px;color:var(--paper-dark)}
+.preview-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:1}
+.preview-img.show{display:block}
+.upload-hover{position:absolute;inset:0;z-index:2;background:rgba(10,8,4,0);
+  display:flex;align-items:center;justify-content:center;transition:background .3s}
+.upload-zone.filled:hover .upload-hover{background:rgba(10,8,4,.65)}
+.hover-lbl{display:none;font-size:10px;letter-spacing:5px;color:var(--paper);
+  border:1px solid rgba(200,169,110,.5);padding:8px 20px}
+.upload-zone.filled:hover .hover-lbl{display:block}
+
+.detect-strip{display:none;align-items:center;gap:12px;padding:11px 18px;
+  background:rgba(139,26,26,.1);border:1px solid rgba(139,26,26,.25);border-top:none;margin-bottom:40px}
+.detect-strip.show{display:flex}
+.detect-flame{font-size:13px;animation:flameDance 1s ease-in-out infinite alternate}
+@keyframes flameDance{from{transform:scale(1) rotate(-3deg)}to{transform:scale(1.1) rotate(3deg)}}
+.detect-txt{font-size:10px;letter-spacing:4px;color:var(--paper-dim)}
+
+/* INPUTS */
+.saju-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:40px}
+.field-group{display:flex;flex-direction:column;gap:7px}
+.field-label{font-size:9px;letter-spacing:4px;color:var(--paper-dark);text-transform:uppercase}
+.field-input{background:rgba(200,169,110,.04);border:none;border-bottom:1px solid rgba(184,134,11,.25);
+  padding:11px 4px;font-family:'Noto Serif KR',serif;font-size:14px;color:var(--paper);
+  outline:none;transition:border-color .2s;width:100%}
+.field-input:focus{border-bottom-color:var(--gold)}
+.field-input option{background:var(--charcoal);color:var(--paper)}
+
+/* ITEMS */
+.items-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:40px}
+.item-card{border:1px solid rgba(184,134,11,.15);background:rgba(200,169,110,.02);
+  padding:14px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px}
+.item-card:hover{border-color:rgba(184,134,11,.4);background:rgba(200,169,110,.05)}
+.item-card.active{border-color:var(--red-dim);background:rgba(139,26,26,.12)}
+.item-hanja{font-size:20px;font-weight:900;color:var(--paper-dark);transition:color .2s;line-height:1;flex-shrink:0}
+.item-card.active .item-hanja{color:var(--red)}
+.item-ko{font-size:12px;font-weight:600;letter-spacing:1px;color:var(--paper)}
+.item-desc{font-size:9px;letter-spacing:1px;color:var(--paper-dark);margin-top:2px}
+.item-mark{margin-left:auto;width:12px;height:12px;border:1px solid rgba(184,134,11,.3);
+  flex-shrink:0;transform:rotate(45deg);transition:all .2s}
+.item-card.active .item-mark{background:var(--red);border-color:var(--red)}
+.items-full{grid-column:1/-1}
+
+/* CTA */
+.ritual-wrap{text-align:center;margin-bottom:12px}
+.ritual-btn{display:inline-flex;align-items:center;gap:14px;padding:18px 56px;
+  background:transparent;border:1px solid rgba(139,26,26,.6);color:var(--paper);
+  font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;letter-spacing:7px;
+  cursor:pointer;position:relative;overflow:hidden;transition:all .3s}
+.ritual-btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(139,26,26,0),rgba(139,26,26,.2),rgba(139,26,26,0));
+  transform:translateX(-100%);transition:transform .7s}
+.ritual-btn:hover::before{transform:translateX(100%)}
+.ritual-btn:hover{border-color:var(--red);box-shadow:0 0 40px rgba(139,26,26,.2)}
+.ritual-btn:disabled{opacity:.35;cursor:not-allowed}
+.ritual-flame{font-size:16px;animation:flameDance 1s ease-in-out infinite alternate}
+.ritual-note{font-size:9px;letter-spacing:3px;color:var(--paper-dark);margin-top:10px}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:16px;margin:48px 0 36px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gold);opacity:.2}
+.div-diamond{width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);opacity:.6}
+
+/* RESULT */
+.result-wrap{display:none;animation:resultReveal .8s ease}
+.result-wrap.show{display:block}
+@keyframes resultReveal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.result-top{text-align:center;padding:32px 0 24px;
+  border-top:1px solid rgba(184,134,11,.2);border-bottom:1px solid rgba(184,134,11,.2);margin-bottom:32px}
+.result-label{font-size:9px;letter-spacing:6px;color:var(--paper-dark);margin-bottom:12px}
+.result-title-text{font-size:clamp(24px,5vw,42px);font-weight:900;letter-spacing:6px;color:var(--paper);
+  text-shadow:0 0 30px rgba(184,134,11,.15)}
+.result-stamp{display:inline-block;margin-top:12px;border:2px solid var(--red-dim);
+  padding:4px 12px;font-size:10px;letter-spacing:4px;color:var(--red);transform:rotate(-2deg);opacity:.8}
+
+/* 얼굴 도해 */
+.face-diagram-wrap{background:linear-gradient(135deg,#1a1208,#0e0a05);
+  border:1px solid rgba(184,134,11,.2);margin-bottom:24px;overflow:hidden}
+.face-diagram-inner{position:relative;width:100%;display:flex;
+  align-items:center;justify-content:center;padding:32px 16px;min-height:420px;gap:0}
+
+.anno-col{flex:1;display:flex;flex-direction:column;gap:24px;padding:0 12px}
+.anno-col.left{align-items:flex-end}
+.anno-col.right{align-items:flex-start}
+
+.anno-item{display:flex;flex-direction:column;gap:3px;max-width:150px;
+  animation:annoReveal .6s ease both}
+.anno-item:nth-child(1){animation-delay:.3s}
+.anno-item:nth-child(2){animation-delay:.5s}
+.anno-item:nth-child(3){animation-delay:.7s}
+@keyframes annoReveal{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.anno-col.right .anno-item{animation-name:annoRevealR}
+@keyframes annoRevealR{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+
+.anno-hanja{font-size:12px;font-weight:900;color:var(--red);letter-spacing:2px}
+.anno-part{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--paper)}
+.anno-bar{height:1px;width:100%;margin:3px 0;
+  background:linear-gradient(90deg,rgba(184,134,11,.5),transparent)}
+.anno-col.right .anno-bar{background:linear-gradient(90deg,transparent,rgba(184,134,11,.5))}
+.anno-short{font-size:10px;color:var(--paper-dim);line-height:1.5;
+  font-family:'Noto Sans KR',sans-serif;font-weight:300;word-break:keep-all}
+.anno-col.left .anno-hanja,
+.anno-col.left .anno-part,
+.anno-col.left .anno-short{text-align:right}
+
+/* 얼굴 이미지 */
+.face-center{position:relative;width:230px;height:300px;flex-shrink:0}
+.face-center img{width:100%;height:100%;object-fit:cover;object-position:top center;
+  border-radius:3px;filter:sepia(15%) contrast(1.08);display:block}
+.face-center::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(10,8,4,.75) 100%);
+  border-radius:3px;pointer-events:none}
+
+.face-svg{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}
+
+/* 운세 게이지 */
+.gauge-section{border:1px solid rgba(184,134,11,.12);margin-bottom:14px;overflow:hidden}
+.gauge-head{padding:11px 18px;background:rgba(184,134,11,.05);
+  border-bottom:1px solid rgba(184,134,11,.1);font-size:10px;letter-spacing:4px;
+  color:var(--gold);display:flex;align-items:center;gap:8px}
+.gauges{padding:18px;display:flex;flex-direction:column;gap:14px}
+.gauge-row{display:grid;grid-template-columns:48px 1fr 34px;align-items:center;gap:12px}
+.gauge-lbl{font-size:11px;letter-spacing:2px;color:var(--paper-dark)}
+.gauge-track{height:2px;background:rgba(200,169,110,.1);position:relative;overflow:hidden}
+.gauge-fill{position:absolute;left:0;top:0;height:100%;width:0%;
+  background:linear-gradient(90deg,var(--red-dim),var(--red));
+  transition:width 1.8s cubic-bezier(.22,1,.36,1)}
+.gauge-val{font-size:11px;color:var(--red);font-weight:700;text-align:right}
+
+/* 결과 카드 */
+.res-card{border:1px solid rgba(184,134,11,.12);margin-bottom:12px;overflow:hidden;
+  background:rgba(200,169,110,.015)}
+.res-card-head{padding:11px 18px;background:rgba(184,134,11,.04);
+  border-bottom:1px solid rgba(184,134,11,.1);font-size:10px;letter-spacing:4px;
+  color:var(--gold);display:flex;align-items:center;gap:10px}
+.res-card-body{padding:20px 18px;font-size:13px;line-height:2.2;
+  color:rgba(200,169,110,.8);white-space:pre-wrap;word-break:keep-all;
+  font-family:'Noto Sans KR',sans-serif;font-weight:300}
+
+.oracle-box{padding:24px;text-align:center}
+.oracle-quote{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:600;
+  line-height:1.9;letter-spacing:1px;color:var(--paper);margin-bottom:12px}
+.oracle-date{font-size:9px;letter-spacing:4px;color:var(--paper-dark)}
+
+.share-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.share-btn{padding:13px;background:transparent;border:1px solid rgba(184,134,11,.2);
+  font-family:'Noto Serif KR',serif;font-size:11px;letter-spacing:3px;
+  color:var(--paper-dim);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.share-btn:hover{border-color:var(--gold);color:var(--paper)}
+.share-btn.reset{border-color:rgba(139,26,26,.3);color:var(--red-dim)}
+.share-btn.reset:hover{border-color:var(--red);color:var(--red-bright)}
+
+/* LOADING */
+.loading-screen{display:none;position:fixed;inset:0;background:rgba(10,8,4,.97);
+  z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:28px;backdrop-filter:blur(6px)}
+.loading-screen.show{display:flex}
+.lantern-outer{width:80px;height:80px;border:1px solid rgba(139,26,26,.5);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  animation:lanternBreath 2s ease-in-out infinite;
+  box-shadow:0 0 30px rgba(139,26,26,.2),inset 0 0 20px rgba(139,26,26,.1)}
+@keyframes lanternBreath{0%,100%{box-shadow:0 0 20px rgba(139,26,26,.15)}
+  50%{box-shadow:0 0 50px rgba(139,26,26,.35)}}
+.lantern-char{font-size:36px;font-weight:900;color:var(--red);text-shadow:0 0 20px rgba(192,57,43,.6)}
+.loading-title{font-size:17px;font-weight:600;letter-spacing:6px;color:var(--paper)}
+.loading-msgs{font-size:10px;letter-spacing:3px;color:var(--paper-dark);
+  min-height:22px;text-align:center;animation:msgFade 2.5s ease-in-out infinite}
+@keyframes msgFade{0%,100%{opacity:.4}50%{opacity:1}}
+.loading-dots{display:flex;gap:8px}
+.loading-dots span{width:4px;height:4px;background:var(--red-dim);border-radius:50%;
+  animation:dotPop 1.2s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotPop{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.3)}}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--charcoal);border:1px solid rgba(184,134,11,.3);color:var(--paper);
+  padding:12px 28px;font-size:10px;letter-spacing:3px;transition:transform .3s;
+  z-index:600;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+footer{border-top:1px solid rgba(184,134,11,.1);text-align:center;padding:24px}
+.footer-txt{font-size:9px;letter-spacing:5px;color:rgba(200,169,110,.2)}
+
+@media(max-width:600px){
+  .saju-row,.items-grid,.share-row{grid-template-columns:1fr}
+  .items-full{grid-column:1}
+  .face-diagram-inner{flex-direction:column;padding:20px 12px;gap:16px}
+  .anno-col{flex-direction:row;flex-wrap:wrap;width:100%;padding:0;justify-content:center}
+  .anno-col.left .anno-hanja,.anno-col.left .anno-part,.anno-col.left .anno-short{text-align:center}
+  .anno-item{align-items:center;max-width:130px}
+  .face-center{width:180px;height:240px}
+}
+</style>
+</head>
+<body>
+<div class="candle-glow"></div>
+
+<div class="loading-screen" id="loading">
+  <div class="lantern-outer"><div class="lantern-char">觀</div></div>
+  <div class="loading-title">관상을 읽는 중</div>
+  <div class="loading-msgs" id="loadingMsg">하늘의 기운이 모이고 있습니다</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="wrap">
+<header>
+  <div class="header-seal">
+    <div class="seal-circle"></div>
+    <div class="site-title">관상소</div>
+    <div class="site-tagline">얼굴이 곧 운명이다</div>
+    <div class="ornament-row">
+      <div class="orn-line"></div>
+      <div class="orn-char">相 · 命 · 術</div>
+      <div class="orn-line r"></div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="sec-head"><span class="sec-hanja">相</span><span class="sec-ko">관상 사진</span><div class="sec-rule"></div></div>
+  <div class="upload-zone" id="uploadZone">
+    <span class="uz-corner tl">乾</span><span class="uz-corner tr">坤</span>
+    <span class="uz-corner bl">坎</span><span class="uz-corner br">離</span>
+    <input type="file" accept="image/*" onchange="handleUpload(event)" />
+    <div class="upload-eye" id="uploadEye">👁</div>
+    <div class="upload-tm" id="uploadTM">얼굴을 올려주시오</div>
+    <div class="upload-ts" id="uploadTS">정면 사진이 가장 정확하오이다</div>
+    <img class="preview-img" id="previewImg" />
+    <div class="upload-hover"><div class="hover-lbl">사진 교체</div></div>
+  </div>
+  <div class="detect-strip" id="detectStrip">
+    <span class="detect-flame">🕯</span>
+    <span class="detect-txt">관상 사진이 접수되었습니다 — 점술 준비 완료</span>
+  </div>
+
+  <div class="sec-head"><span class="sec-hanja">命</span><span class="sec-ko">사주 정보</span><div class="sec-rule"></div></div>
+  <div class="saju-row">
+    <div class="field-group">
+      <div class="field-label">생년월일</div>
+      <input class="field-input" type="date" id="birthDate" />
+    </div>
+    <div class="field-group">
+      <div class="field-label">성별</div>
+      <select class="field-input" id="gender">
+        <option value="">선택하시오</option>
+        <option value="남성">남성 ♂</option>
+        <option value="여성">여성 ♀</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sec-head"><span class="sec-hanja">術</span><span class="sec-ko">살펴볼 항목</span><div class="sec-rule"></div></div>
+  <div class="items-grid">
+    <div class="item-card active" data-key="overall" onclick="toggleItem(this)">
+      <span class="item-hanja">運</span>
+      <div><div class="item-ko">전체 운세</div><div class="item-desc">재물·연애·건강·직업</div></div>
+      <div class="item-mark"></div>
+    </div>
+    <div class="item-card active" data-key="love" onclick="toggleItem(this)">
+      <span class="item-hanja">緣</span>
+      <div><div class="item-ko">연애운</div><div class="item-desc">인연·궁합·연애 흐름</div></div>
+      <div class="item-mark"></div>
+    </div>
+    <div class="item-card active" data-key="face" onclick="toggleItem(this)">
+      <span class="item-hanja">顔</span>
+      <div><div class="item-ko">관상 분석</div><div class="item-desc">이목구비 세밀 해석</div></div>
+      <div class="item-mark"></div>
+    </div>
+    <div class="item-card active" data-key="past" onclick="toggleItem(this)">
+      <span class="item-hanja">宿</span>
+      <div><div class="item-ko">전생 & 팔자</div><div class="item-desc">전생 직업·타고난 팔자</div></div>
+      <div class="item-mark"></div>
+    </div>
+    <div class="item-card active items-full" data-key="today" onclick="toggleItem(this)">
+      <span class="item-hanja">占</span>
+      <div><div class="item-ko">오늘의 신탁</div><div class="item-desc">오늘 하루를 위한 점술의 말씀</div></div>
+      <div class="item-mark"></div>
+    </div>
+  </div>
+
+  <div class="ritual-wrap">
+    <button class="ritual-btn" onclick="startDivination()">
+      <span class="ritual-flame">🕯</span> 관상을 보아라 <span class="ritual-flame">🕯</span>
+    </button>
+    <div class="ritual-note">※ 본 서비스는 오락 목적이며 실제 운명을 예언하지 않습니다</div>
+  </div>
+
+  <!-- 결과 -->
+  <div class="result-wrap" id="resultWrap">
+    <div class="divider"><div class="div-diamond"></div></div>
+    <div class="result-top">
+      <div class="result-label">신탁의 결과</div>
+      <div class="result-title-text" id="resultTitleText">관상 풀이</div>
+      <div class="result-stamp">판독 완료</div>
+    </div>
+
+    <div class="sec-head"><span class="sec-hanja">顔</span><span class="sec-ko">관상 도해</span><div class="sec-rule"></div></div>
+    <div class="face-diagram-wrap">
+      <div class="face-diagram-inner" id="faceDiagramInner"></div>
+    </div>
+
+    <div class="divider"><div class="div-diamond"></div></div>
+
+    <div class="gauge-section" id="gaugeSection" style="display:none">
+      <div class="gauge-head">📊 &nbsp; 운세 지수</div>
+      <div class="gauges" id="gaugesInner"></div>
+    </div>
+    <div class="res-card" id="overallCard" style="display:none">
+      <div class="res-card-head">運 &nbsp; 전체 운세</div>
+      <div class="res-card-body" id="overallBody"></div>
+    </div>
+    <div class="res-card" id="loveCard" style="display:none">
+      <div class="res-card-head">緣 &nbsp; 연애운</div>
+      <div class="res-card-body" id="loveBody"></div>
+    </div>
+    <div class="res-card" id="pastCard" style="display:none">
+      <div class="res-card-head">宿 &nbsp; 전생 & 팔자</div>
+      <div class="res-card-body" id="pastBody"></div>
+    </div>
+    <div class="res-card" id="todayCard" style="display:none">
+      <div class="res-card-head">占 &nbsp; 오늘의 신탁</div>
+      <div class="oracle-box">
+        <div class="oracle-quote" id="oracleQuote"></div>
+        <div class="oracle-date" id="oracleDate"></div>
+      </div>
+    </div>
+
+    <div class="share-row">
+      <button class="share-btn" onclick="shareResult()">🔗 &nbsp; 결과 공유</button>
+      <button class="share-btn reset" onclick="resetAll()">↩ &nbsp; 다시 보기</button>
+    </div>
+  </div>
+
+</div>
+<footer><div class="footer-txt">관상소 &nbsp;·&nbsp; 얼굴이 곧 운명이다 &nbsp;·&nbsp; AI 관상술</div></footer>
+</div>
+
+<script>
+let uploadedB64=null, uploadedType='image/jpeg', previewDataUrl=null;
+const MSGS=['하늘의 기운이 모이고 있습니다','얼굴의 기색을 살피는 중이오','이목구비에 새겨진 운명을 읽고 있소','전생의 업보를 펼치는 중이오','오늘의 신탁을 내리는 중이오','관상이 완성되어 가오'];
+let msgIdx=0, msgTimer=null;
+
+function handleUpload(e){
+  const file=e.target.files[0]; if(!file)return;
+  const valid=['image/jpeg','image/png','image/gif','image/webp'];
+  uploadedType=valid.includes(file.type)?file.type:'image/jpeg';
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const c=document.createElement('canvas');
+      const MAX=640; let w=img.width,h=img.height;
+      if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;}else if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+      c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h);
+      previewDataUrl=c.toDataURL('image/jpeg',.85);
+      uploadedB64=previewDataUrl.split(',')[1];
+      document.getElementById('previewImg').src=previewDataUrl;
+      document.getElementById('previewImg').classList.add('show');
+      document.getElementById('uploadZone').classList.add('filled');
+      ['uploadEye','uploadTM','uploadTS'].forEach(id=>document.getElementById(id).style.display='none');
+      document.getElementById('detectStrip').classList.add('show');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleItem(el){el.classList.toggle('active')}
+function getSelected(){return[...document.querySelectorAll('.item-card.active')].map(c=>c.dataset.key)}
+
+async function startDivination(){
+  if(!uploadedB64){showToast('관상 사진을 먼저 올려주시오');return;}
+  const items=getSelected();
+  if(!items.length){showToast('살펴볼 항목을 선택하시오');return;}
+
+  const birth=document.getElementById('birthDate').value;
+  const gender=document.getElementById('gender').value;
+  const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+  showLoading();
+
+  try{
+    // ★ 백엔드 API 호출 ★
+    const res=await fetch('/api/gwansang',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        imageBase64: uploadedB64,
+        imageType:   uploadedType,
+        items, birth, gender, today
+      })
+    });
+
+    const result=await res.json();
+    if(!res.ok) throw new Error(result.error||'서버 오류');
+    renderResult(result, items, today);
+
+  }catch(err){
+    showToast('⚠️ '+err.message);
+    console.error(err);
+  }finally{
+    hideLoading();
+  }
+}
+
+function renderResult(r, items, today){
+  document.getElementById('resultTitleText').textContent=r.title||'관상 풀이';
+  buildFaceDiagram(r.face_points||[]);
+
+  if(r.gauges && items.includes('overall')){
+    document.getElementById('gaugeSection').style.display='block';
+    document.getElementById('gaugesInner').innerHTML=Object.entries(r.gauges).map(([k,v])=>`
+      <div class="gauge-row">
+        <div class="gauge-lbl">${k}</div>
+        <div class="gauge-track"><div class="gauge-fill" data-val="${v}"></div></div>
+        <div class="gauge-val">${v}</div>
+      </div>`).join('');
+    setTimeout(()=>document.querySelectorAll('.gauge-fill').forEach(el=>el.style.width=el.dataset.val+'%'),200);
+  }
+
+  const show=(key,cid,bid,txt)=>{if(items.includes(key)&&txt){document.getElementById(cid).style.display='block';document.getElementById(bid).textContent=txt;}};
+  show('overall','overallCard','overallBody',r.overall);
+  show('love','loveCard','loveBody',r.love);
+  show('past','pastCard','pastBody',r.past);
+
+  if(items.includes('today')&&r.today){
+    document.getElementById('todayCard').style.display='block';
+    document.getElementById('oracleQuote').textContent=r.today;
+    document.getElementById('oracleDate').textContent=today;
+  }
+
+  document.getElementById('resultWrap').classList.add('show');
+  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildFaceDiagram(points){
+  const inner=document.getElementById('faceDiagramInner');
+  const leftPts=points.filter(p=>p.side==='left');
+  const rightPts=points.filter(p=>p.side==='right');
+
+  const makeAnno=(pts)=>pts.map(p=>`
+    <div class="anno-item">
+      <div class="anno-hanja">${p.hanja}</div>
+      <div class="anno-part">${p.part}</div>
+      <div class="anno-bar"></div>
+      <div class="anno-short">${p.short}</div>
+    </div>`).join('');
+
+  inner.innerHTML=`
+    <div class="anno-col left">${makeAnno(leftPts)}</div>
+    <div class="face-center" id="faceCenter">
+      <img src="${previewDataUrl}" alt="관상 사진" />
+      <svg class="face-svg" id="faceSvg" viewBox="0 0 230 300" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="anno-col right">${makeAnno(rightPts)}</div>
+  `;
+
+  setTimeout(()=>drawSvgPoints(points),100);
+}
+
+function drawSvgPoints(points){
+  const svg=document.getElementById('faceSvg');
+  if(!svg)return;
+  const W=230, H=300, cx=W/2;
+  let html='';
+
+  points.forEach(p=>{
+    const py=(p.y_pct/100)*H;
+    const isLeft=p.side==='left';
+    const px=isLeft? cx-45 : cx+45;
+    const ex=isLeft? 8 : W-8;
+    const mid=(px+ex)/2;
+
+    // 점
+    html+=`<circle cx="${px}" cy="${py}" r="5" fill="none" stroke="#8B1A1A" stroke-width="1.2" opacity=".85"/>`;
+    html+=`<circle cx="${px}" cy="${py}" r="2" fill="#C0392B" opacity=".9"/>`;
+    // 곡선 연결선
+    html+=`<path d="M${px},${py} Q${mid},${py} ${ex},${py}" fill="none" stroke="rgba(184,134,11,.45)" stroke-width=".8"/>`;
+    // 화살표
+    const d=isLeft?-1:1;
+    html+=`<polygon points="${ex},${py} ${ex-d*5},${py-2.5} ${ex-d*5},${py+2.5}" fill="rgba(184,134,11,.55)"/>`;
+  });
+
+  svg.innerHTML=html;
+}
+
+function showLoading(){
+  msgIdx=0; document.getElementById('loadingMsg').textContent=MSGS[0];
+  document.getElementById('loading').classList.add('show');
+  msgTimer=setInterval(()=>{msgIdx=(msgIdx+1)%MSGS.length; document.getElementById('loadingMsg').textContent=MSGS[msgIdx];},2500);
+}
+function hideLoading(){clearInterval(msgTimer); document.getElementById('loading').classList.remove('show')}
+function resetAll(){
+  document.getElementById('resultWrap').classList.remove('show');
+  ['gaugeSection','overallCard','loveCard','pastCard','todayCard'].forEach(id=>document.getElementById(id).style.display='none');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function shareResult(){
+  const title=document.getElementById('resultTitleText').textContent;
+  const text=`나의 관상: ${title}\n관상소에서 확인해보세요 🕯`;
+  if(navigator.share) navigator.share({title:'관상소',text});
+  else navigator.clipboard.writeText(text).then(()=>showToast('클립보드에 복사되었소'));
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
