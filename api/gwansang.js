@@ -27,38 +27,49 @@ ${info ? `의뢰인 정보: ${info}` : ''}
     {"part": "귀",   "hanja": "耳", "side": "left",  "y_pct": 42, "reading": "귀가 두툼하여 수명장수할 상이오", "short": "장수의 귀"},
     {"part": "턱",   "hanja": "頤", "side": "right", "y_pct": 84, "reading": "턱이 각져 말년에 복록이 들어오리오", "short": "말년복"}
   ],
-  "overall": "${(items || []).includes('overall') ? '전체 운세. 재물/연애/건강/직업 각각. 관상가 말투로 시작해서 MZ 감성으로 마무리. 이모지 활용. 12~15줄.' : ''}",
-  "love":    "${(items || []).includes('love')    ? '연애운 집중 분석. 어떤 인연이 오는지, 지금 연애 흐름. 두근거리고 공감 가게. 8~10줄.' : ''}",
-  "past":    "${(items || []).includes('past')    ? '전생과 팔자. 전생 직업과 현생 팔자. 황당하지만 그럴싸하게. 어딘가 찔리는 내용으로.' : ''}",
-  "today":   "${(items || []).includes('today')   ? '오늘의 신탁 한마디. 짧고 강렬하고 시적으로. 1~2문장.' : ''}"
+  "overall": "${(items||[]).includes('overall') ? '전체 운세. 재물/연애/건강/직업 각각. 관상가 말투로 시작해서 MZ 감성으로 마무리. 이모지 활용. 12~15줄.' : ''}",
+  "love":    "${(items||[]).includes('love')    ? '연애운 집중 분석. 어떤 인연이 오는지, 지금 연애 흐름. 두근거리고 공감 가게. 8~10줄.' : ''}",
+  "past":    "${(items||[]).includes('past')    ? '전생과 팔자. 전생 직업과 현생 팔자. 황당하지만 그럴싸하게.' : ''}",
+  "today":   "${(items||[]).includes('today')   ? '오늘의 신탁 한마디. 짧고 강렬하고 시적으로. 1~2문장.' : ''}"
 }`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
+        model: 'gpt-4o',
         max_tokens: 2500,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: imageType || 'image/jpeg', data: imageBase64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:${imageType || 'image/jpeg'};base64,${imageBase64}`,
+                  detail: 'high'
+                }
+              },
+              {
+                type: 'text',
+                text: prompt
+              }
+            ]
+          }
+        ]
       })
     });
 
     const data = await response.json();
-    if (!response.ok || data.error) throw new Error(data.error?.message || `API 오류 ${response.status}`);
+    if (!response.ok || data.error) throw new Error(data.error?.message || `OpenAI 오류 ${response.status}`);
 
-    const text = data.content?.map(c => c.text || '').join('') || '';
-    const match = text.match(/\{[\s\S]*\}/);
+    const text = data.choices?.[0]?.message?.content || '';
+    const clean = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    const match = clean.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('결과 파싱 실패: ' + text.substring(0, 200));
 
     const result = JSON.parse(match[0]);
