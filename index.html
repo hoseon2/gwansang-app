@@ -454,7 +454,17 @@ footer{border-top:1px solid rgba(184,134,11,.09);text-align:center;padding:22px}
   <div class="saju-row">
     <div class="field-group">
       <div class="field-label">생년월일</div>
-      <input class="field-input" type="date" id="birthDate" />
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px">
+        <select class="field-input" id="birthYear" style="padding:10px 4px">
+          <option value="">년도</option>
+        </select>
+        <select class="field-input" id="birthMonth" style="padding:10px 4px">
+          <option value="">월</option>
+        </select>
+        <select class="field-input" id="birthDay" style="padding:10px 4px">
+          <option value="">일</option>
+        </select>
+      </div>
     </div>
     <div class="field-group">
       <div class="field-label">성별</div>
@@ -630,7 +640,10 @@ async function startDivination(){
   if(!uploadedB64){showToast('관상 사진을 먼저 올려주시오');return;}
   const items=getSelected();
   if(!items.length){showToast('살펴볼 항목을 선택하시오');return;}
-  const birth=document.getElementById('birthDate').value;
+  const y=document.getElementById('birthYear').value;
+  const m=document.getElementById('birthMonth').value;
+  const d=document.getElementById('birthDay').value;
+  const birth = (y&&m&&d) ? y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0') : '';
   const gender=document.getElementById('gender').value;
   const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
   showLoading();
@@ -737,11 +750,19 @@ function buildFaceDiagram(points){
 function drawSvgPoints(points){
   const svg=document.getElementById('faceSvg'); if(!svg)return;
   const W=210, H=280, cx=W/2;
+  // 부위별 실제 x 위치 (얼굴 중심 기준, 비율%)
+  const FEAT_X={
+    '이마':{left:40,right:60}, '눈썹':{left:33,right:67},
+    '눈':{left:34,right:66},   '코':{left:44,right:56},
+    '귀':{left:8, right:92},   '입':{left:43,right:57},
+    '턱':{left:44,right:56},   'default':{left:38,right:62}
+  };
   let html='';
   points.forEach(p=>{
     const py=(p.y_pct/100)*H;
     const isLeft=p.side==='left';
-    const px=isLeft?cx-40:cx+40;
+    const fx=FEAT_X[p.part]||FEAT_X['default'];
+    const px=(fx[isLeft?'left':'right']/100)*W;
     const ex=isLeft?6:W-6;
     const mid=(px+ex)/2;
     const isGood=p.grade==='good';
@@ -780,6 +801,35 @@ function shareResult(){
   else navigator.clipboard.writeText(`[관상소] ${title} ${score}점 — ${summary}`).then(()=>showToast('클립보드에 복사되었소'));
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// 생년월일 드롭다운 초기화
+(function(){
+  const yEl=document.getElementById('birthYear');
+  const mEl=document.getElementById('birthMonth');
+  const dEl=document.getElementById('birthDay');
+  if(!yEl) return;
+  const now=new Date().getFullYear();
+  for(let y=now;y>=1930;y--){
+    const o=document.createElement('option');o.value=y;o.textContent=y+'년';yEl.appendChild(o);
+  }
+  for(let m=1;m<=12;m++){
+    const o=document.createElement('option');o.value=m;o.textContent=m+'월';mEl.appendChild(o);
+  }
+  function updateDays(){
+    const y=+yEl.value||2000, m=+mEl.value||1;
+    const max=new Date(y,m,0).getDate();
+    const cur=+dEl.value;
+    dEl.innerHTML='<option value="">일</option>';
+    for(let d=1;d<=max;d++){
+      const o=document.createElement('option');o.value=d;o.textContent=d+'일';
+      if(d===cur) o.selected=true;
+      dEl.appendChild(o);
+    }
+  }
+  yEl.addEventListener('change',updateDays);
+  mEl.addEventListener('change',updateDays);
+  updateDays();
+})();
 </script>
 </body>
 </html>
